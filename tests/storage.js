@@ -5,7 +5,7 @@ const expect = require('chai').expect;
 const todoStatus = require('../todo-status');
 const storage = require('../storage');
 
-assert.isPromise = function(theThing) {
+function expectMyPromise(theThing) {
     expect(theThing).to.be.instanceOf(Object);
     expect(theThing.then).to.be.instanceOf(Function);
     expect(theThing.catch).to.be.instanceOf(Function);
@@ -26,7 +26,7 @@ describe("In-memory storage", function() {
 
     it('should reject when trying to UPDATE a TODO with an unknown ID', function(done) {
         const updatePromise = storage.updateTodo(-1, 'title-1', todoStatus.NOT_DONE);
-        assert.isPromise(updatePromise);
+        expectMyPromise(updatePromise);
 
         updatePromise.catch(function(err) {
             return err;
@@ -38,7 +38,7 @@ describe("In-memory storage", function() {
 
     it('should GET todos', function(done) {
         const savedTodoPromise = storage.saveTodo({ title: 'title2' });
-        assert.isPromise(savedTodoPromise);
+        expectMyPromise(savedTodoPromise);
         let savedTodo;
 
         savedTodoPromise.then(function(newTodo) {
@@ -64,8 +64,8 @@ describe("In-memory storage", function() {
     it('should DELETE selected todo', function(done) {
         const savedTodosPromise1 = storage.saveTodo({ title: 'titledelete3' });
         const savedTodosPromise2 = storage.saveTodo({ title: 'titledelete4' });
-        assert.isPromise(savedTodosPromise1);
-        assert.isPromise(savedTodosPromise2);
+        expectMyPromise(savedTodosPromise1);
+        expectMyPromise(savedTodosPromise2);
 
         Promise.all([savedTodosPromise1, savedTodosPromise2])
             .then(function(newSavedTodos) {
@@ -81,5 +81,20 @@ describe("In-memory storage", function() {
                 done();
             })
             .catch(done);
+    });
+
+
+    it('should be ok if status isn\'t present in UPDATE', function(done) {
+        const updatePromise = storage.updateTodo('1', 'title-1');
+        expectMyPromise(updatePromise);
+
+        updatePromise.then(function(smth) {
+            expect(smth).to.not.be.an('undefined');
+            expect(smth.id).to.equal('1');
+            expect(smth.title).to.equal('title-1');
+            console.log(smth.status);
+            expect(smth.status).to.equal(todoStatus.NOT_DONE);
+            done();
+        }).catch(done);
     });
 });

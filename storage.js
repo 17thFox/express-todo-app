@@ -43,7 +43,11 @@ function updateTodo(id, newTitle, newStatus) {
     }
 
     todos[id].title = newTitle;
-    todos[id].status = newStatus;
+    if (typeof newStatus === 'undefined') {
+        todos[id].status = todos[id].status;
+    } else {
+        todos[id].status = newStatus;
+    }
     return Promise.resolve(todos[id]);
 }
 

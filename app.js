@@ -8,9 +8,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var index = require('./routes/index');
-var users = require('./routes/users');
-
-var storage = require('./storage');
+var todosApi = require('./routes/todos-api');
 
 var app = express();
 
@@ -26,49 +24,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// app.use('/', index);
-// app.use('/users', users);
-
-
-app.get('/', function(req, res) {
-    storage.getTodos()
-        .then(function(todos) {
-            return res.json(todos);
-        })
-        .catch(function(err) {
-            return res.status(500).send(err);
-        });
-});
-
-app.post('/', function(req, res) {
-    storage.saveTodo(req.body)
-        .then(function(newTodo) {
-            return res.json(newTodo);
-        })
-        .catch(function(err) {
-            return res.status(500).send(err);
-        });
-});
-
-app.put('/', function(req, res) {
-    storage.updateTodo(req.body)
-        .then(function(todos) {
-            return res.json(todos);
-        })
-        .catch(function(err) {
-            return res.status(500).send(err);
-        });
-});
-
-app.delete('/', function(req, res) {
-    storage.updateTodo(req.body)
-        .then(function(todos) {
-            return res.json(todos);
-        })
-        .catch(function(err) {
-            return res.status(500).send(err);
-        });
-});
+app.use('/', index);
+app.use('/api/todos', todosApi);
 
 
 // catch 404 and forward to error handler
