@@ -92,7 +92,6 @@ describe("In-memory storage", function() {
             expect(smth).to.not.be.an('undefined');
             expect(smth.id).to.equal('1');
             expect(smth.title).to.equal('title-1');
-            console.log(smth.status);
             expect(smth.status).to.equal(todoStatus.NOT_DONE);
             done();
         }).catch(done);

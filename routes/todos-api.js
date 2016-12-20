@@ -34,7 +34,6 @@ router.put('/', function(req, res) {
 });
 
 router.delete('/:id', function(req, res) {
-	console.log(req.params)
     storage.deleteTodo(req.params.id)
         .then(function(todos) {
             return res.json(todos);

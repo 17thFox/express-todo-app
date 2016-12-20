@@ -1,9 +1,39 @@
 'use strict';
 
+const fs = require('fs');
+
 const todoStatus = require('./todo-status');
+
+const storageFileName = './storage.json';
 
 let counter = 1;
 let todos = {};
+
+// first step
+//read from storage.json (if exists) fs.readFileSync
+
+// THIS IS NOT SAFE
+fs.readFile(storageFileName, function read(err, data) {
+    if (err) {
+        return console.log(err);
+    }
+    let content = JSON.parse(data);
+    counter = content.counter;
+    todos = content.todos;
+});
+
+
+function persistToDisk() {
+    fs.writeFile(storageFileName, JSON.stringify({
+        counter: counter,
+        todos: todos
+    }), function(err) {
+        if (err)
+            return console.log(err);
+    });
+
+    return 
+}
 
 function getTodos(status) {
     const result = [];
@@ -33,6 +63,7 @@ function saveTodo(todo) {
     };
 
     counter += 1;
+    persistToDisk();
     return Promise.resolve(newTodo);
 }
 
@@ -48,6 +79,7 @@ function updateTodo(id, newTitle, newStatus) {
     } else {
         todos[id].status = newStatus;
     }
+    persistToDisk();
     return Promise.resolve(todos[id]);
 }
 
@@ -58,8 +90,8 @@ function deleteTodo(id) {
     }
 
     delete todos[id];
+    persistToDisk();
     return Promise.resolve(todos);
-
 }
 
 
