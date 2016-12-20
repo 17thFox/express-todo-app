@@ -30,51 +30,63 @@ app.use(express.static(path.join(__dirname, 'public')));
 // app.use('/users', users);
 
 
-app.get('/', function (req, res) {
-	storage.getTodos()
-	.then(function (todos) {
-	  	return res.json(todos);
-	})
-	.catch(function (err) {
-		return res.status(500).send(err);
-	});
+app.get('/', function(req, res) {
+    storage.getTodos()
+        .then(function(todos) {
+            return res.json(todos);
+        })
+        .catch(function(err) {
+            return res.status(500).send(err);
+        });
 });
 
-app.post('/', function (req, res) {
-  storage.saveTodo(req.body)
-  .then(function (newTodo) {
-  	return res.json(newTodo);
-  })
-  .catch(function (err) {
-  	return res.status(500).send(err);
-  });
+app.post('/', function(req, res) {
+    storage.saveTodo(req.body)
+        .then(function(newTodo) {
+            return res.json(newTodo);
+        })
+        .catch(function(err) {
+            return res.status(500).send(err);
+        });
 });
 
-app.put('/', function (req, res) {
-  res.send('PUT request to the homepage')
+app.put('/', function(req, res) {
+    storage.updateTodo(req.body)
+        .then(function(todos) {
+            return res.json(todos);
+        })
+        .catch(function(err) {
+            return res.status(500).send(err);
+        });
 });
 
-app.delete('/', function (req, res) {
-  res.send('DELETE request to the homepage')
+app.delete('/', function(req, res) {
+    storage.updateTodo(req.body)
+        .then(function(todos) {
+            return res.json(todos);
+        })
+        .catch(function(err) {
+            return res.status(500).send(err);
+        });
 });
 
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
+    var err = new Error('Not Found');
+    err.status = 404;
+    next(err);
 });
 
 // error handler
 app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+    // set locals, only providing error in development
+    res.locals.message = err.message;
+    res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+    // render the error page
+    res.status(err.status || 500);
+    res.render('error');
 });
 
 module.exports = app;
