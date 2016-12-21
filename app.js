@@ -6,6 +6,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var hbs = require('hbs');
 
 var index = require('./routes/index');
 var todosApi = require('./routes/todos-api');
@@ -22,7 +23,14 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+
+hbs.registerPartials(__dirname + '/views/partials');
+
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Register our {{{block}}} and {{#extend}}{{/extend}} helpers
+require('./block-helpers')(hbs);
 
 app.use('/', index);
 app.use('/api/todos', todosApi);

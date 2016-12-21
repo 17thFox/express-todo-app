@@ -1,2 +1,25 @@
-<h1>{{title}}</h1>
-<p>Welcome to {{title}}</p>
+<div class="container">
+	<h1>{{title}}</h1>
+	<p>Welcome to {{title}}</p>
+	<form id="addTodosForm">
+    <input type="text" id="addTodosInput" name="example" placeholder="ex. learn nodejs">
+    </form>
+</div>
+
+<br>
+
+<div class="container">
+	<ul id="todos" class="list-group">
+	</ul>
+</div>
+
+<hr>
+
+<div class="container">
+	<ul id="doneTodos" class="list-group">
+	</ul>
+</div>
+
+{{#extend "scripts"}}
+    <script type="text/javascript" src="/javascripts/index.js"></script>
+{{/extend}}
