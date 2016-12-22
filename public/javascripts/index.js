@@ -4,12 +4,12 @@
     var $todos = $('#todos');
 
     function myLi(item) {
-        var $li = $('<li class="list-group-item clearfix">');
+        var $li = $('<li class="todo-item list-group-item clearfix">');
         // $li.data('todoId', item.id);
 
         var $doneTodos = $('#doneTodos');
 
-        var $title = $('<span data-editable>').text(item.title);
+        var $title = $('<span class="todo-title" data-editable>').text(item.title);
         $li.append($title);
 
         var $doneButton = $('<button type="button" class="btn btn-info pull-right">').text('DONE');
@@ -23,11 +23,10 @@
             $el.replaceWith($input);
 
             var save = function() {
-
-                console.log(item.id + '  this is item iiiidddddd ')
                 if ($input.val().length === 0) {
                     deleteTodo(item.id, function() {
                         $li.remove();
+                        toastr.error('You removed an item from the To-Do list!');
                     });
                 } else {
                     item.title = $input.val();
@@ -39,37 +38,39 @@
             $input.on('blur', save).focus();
         });
 
-        $doneButton.on('click', function() {
-            item.status = 'done';
+        function toggleTodoStatus() {
+            item.status = item.status === 'done' ? 'not-done' : 'done';
+            $doneButton.toggle();
+            $notDoneButton.toggle();
+            $li.toggleClass('done-todo');
             updateTitle(item.id, item.title, item.status);
-            $doneButton.hide();
-            $notDoneButton.show();
-            $li.append($notDoneButton);
-            $doneTodos.append($li);
-        });
+            var $targetList = item.status === 'done' ? $doneTodos : $todos;
+            $targetList.append($li);
+            item.status === 'done' ? toastr.success('You achieved an item from the To-Do list!') : toastr.success('You resurrected an item from the To-Do list!');
+            
+        }
 
-        $notDoneButton.on('click', function() {
-            item.status = 'not-done';
-            updateTitle(item.id, item.title, item.status);
-            $notDoneButton.hide();
-            $doneButton.show();
-            $todos.append($li);
-        });
+        $doneButton.on('click', toggleTodoStatus);
+        $notDoneButton.on('click', toggleTodoStatus);
 
         $deleteButton.on('click', function() {
             deleteTodo(item.id, function() {
                 $li.remove();
+                toastr.error('You removed an item from the To-Do list!');
             });
         });
 
         $li.append($deleteButton);
+        $li.append($doneButton);
+        $li.append($notDoneButton);
 
         if (item.status === 'not-done') {
-            $li.append($doneButton);
+            $notDoneButton.hide();
             $todos.append($li);
         } else {
-            $li.append($notDoneButton);
+            $doneButton.hide();
             $doneTodos.append($li);
+            $li.toggleClass('done-todo');
         }
     }
 

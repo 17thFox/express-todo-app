@@ -10,3 +10,7 @@ a {
 .list-group {
     line-height: 30px
 }
+
+.todo-item.done-todo span.todo-title {
+	text-decoration: line-through;
+}
