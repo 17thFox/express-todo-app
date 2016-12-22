@@ -7,10 +7,14 @@ a {
     color: #00B7FF;
 }
 
-.list-group {
+.list-group, #addTodosInput{
     line-height: 30px
 }
 
 .todo-item.done-todo span.todo-title {
 	text-decoration: line-through;
+}
+
+.btn{
+	margin-left: 5px;
 }

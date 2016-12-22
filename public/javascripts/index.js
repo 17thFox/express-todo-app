@@ -2,19 +2,20 @@
     'use strict';
 
     var $todos = $('#todos');
+    var $doneTodos = $('#doneTodos');
 
     function myLi(item) {
         var $li = $('<li class="todo-item list-group-item clearfix">');
         // $li.data('todoId', item.id);
 
-        var $doneTodos = $('#doneTodos');
+
 
         var $title = $('<span class="todo-title" data-editable>').text(item.title);
         $li.append($title);
 
-        var $doneButton = $('<button type="button" class="btn btn-info pull-right">').text('DONE');
+        var $doneButton = $('<button type="button" class="btn btn-success pull-right">').text('DONE');
         var $deleteButton = $('<button type="button" class="btn btn-danger pull-right">').text('DELETE');
-        var $notDoneButton = $('<button type="button" class="btn btn-info pull-right">').text('NOT-DONE');
+        var $notDoneButton = $('<button type="button" class="btn btn-warning pull-right">').text('NOT-DONE');
 
         $li.on('click', '[data-editable]', function() {
             var $el = $(this);
@@ -46,8 +47,7 @@
             updateTitle(item.id, item.title, item.status);
             var $targetList = item.status === 'done' ? $doneTodos : $todos;
             $targetList.append($li);
-            item.status === 'done' ? toastr.success('You achieved an item from the To-Do list!') : toastr.success('You resurrected an item from the To-Do list!');
-            
+            item.status === 'done' ? toastr.success('You achieved an item from the To-Do list!') : toastr.warning('You resurrected an item from the To-Do list!');
         }
 
         $doneButton.on('click', toggleTodoStatus);
@@ -73,6 +73,64 @@
             $li.toggleClass('done-todo');
         }
     }
+
+
+    $(function() {
+        $('#markAllDone').on('click', function(event) {
+            event.preventDefault();
+            $.ajax({
+                    method: 'GET',
+                    url: '/api/todos'
+                })
+                .done(function(res) {
+                    $todos.empty();
+                    $doneTodos.empty();
+                    $.each(res, function(idx, item) {
+                        item.status = 'done';
+                        updateTitle(item.id, item.title, item.status);
+                        myLi(item);
+                    });
+                });
+        })
+    })
+
+
+    $(function() {
+        $('#markAllNotDone').on('click', function(event) {
+            event.preventDefault();
+            $.ajax({
+                    method: 'GET',
+                    url: '/api/todos'
+                })
+                .done(function(res) {
+                    $todos.empty();
+                    $doneTodos.empty();
+                    $.each(res, function(idx, item) {
+                        item.status = 'not-done';
+                        updateTitle(item.id, item.title, item.status);
+                        myLi(item);
+                    });
+                });
+        })
+    })
+
+
+    $(function() {
+        $('#removeAll').on('click', function(event) {
+            event.preventDefault();
+            $.ajax({
+                    method: 'GET',
+                    url: '/api/todos'
+                })
+                .done(function(res) {
+                    $todos.empty();
+                    $doneTodos.empty();
+                    $.each(res, function(idx, item) {
+                        deleteTodo(item.id);
+                    });
+                });
+        })
+    })
 
 
     function deleteTodo(id, callback) {

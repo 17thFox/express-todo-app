@@ -1,8 +1,11 @@
 <div class="container">
 	<h1>{{title}}</h1>
 	<p>Welcome to {{title}}</p>
-	<form id="addTodosForm">
-    <input type="text" id="addTodosInput" name="example" placeholder="ex. learn nodejs">
+	<form class="form-inline clearfix" id="addTodosForm">
+    	<input type="text" id="addTodosInput" name="example" placeholder="ex. learn nodejs">
+        <button type="button" id="removeAll" class="btn btn-danger pull-right">Remove all</button>
+        <button type="button" id="markAllNotDone" class="btn btn-warning pull-right">Mark all as Not-Done</button>
+	    <button type="button" id="markAllDone" class="btn btn-success pull-right">Mark all as Done</button>
     </form>
 </div>
 

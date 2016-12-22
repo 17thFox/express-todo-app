@@ -42,8 +42,9 @@ function saveTodo(todo) {
     };
 
     counter += 1;
-    persistentStorage.saveToDisk({counter: counter, todos: todos});
-    return Promise.resolve(newTodo);
+    return persistentStorage.saveToDisk({counter: counter, todos: todos}).then(function () {
+        return Promise.resolve(newTodo);
+    });
 }
 
 
@@ -58,8 +59,9 @@ function updateTodo(id, newTitle, newStatus) {
     } else {
         todos[id].status = newStatus;
     }
-    persistentStorage.saveToDisk({counter: counter, todos: todos});
-    return Promise.resolve(todos[id]);
+    return persistentStorage.saveToDisk({counter: counter, todos: todos}).then(function () { 
+        return Promise.resolve(todos[id]);
+    });
 }
 
 
@@ -69,8 +71,9 @@ function deleteTodo(id) {
     }
 
     delete todos[id];
-    persistentStorage.saveToDisk({counter: counter, todos: todos});
-    return Promise.resolve(todos);
+    return persistentStorage.saveToDisk({counter: counter, todos: todos}).then(function () {
+        return Promise.resolve(todos);
+    });
 }
 
 

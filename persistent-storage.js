@@ -7,26 +7,32 @@ const storageFileName = './storage.json';
 function loadFromDisk() {
     return new Promise(function(resolve, reject) {
         fs.readFile(storageFileName,'utf-8', function read(err, data) {
-            if (data.length === 0) {
-                reject('There\'s nothing to see here');
+            if (!data || data.length === 0) {
+                return reject('There\'s nothing to see here');
             } else if (err) {
-                reject(err);
+                return reject(err);
             }
             let content = JSON.parse(data);
-            resolve(content);
+            return resolve(content);
         });
     });
 }
 
+var savingPromise = Promise.resolve();;
+
 function saveToDisk(content) {
-    return new Promise(function(resolve, reject) {
-        fs.writeFile(storageFileName, JSON.stringify(content), function(err) {
-            if (err)
-                reject(err);
-            else
-                resolve();
+    savingPromise = savingPromise.then(function () {
+        return new Promise(function(resolve, reject) {
+            fs.writeFile(storageFileName, JSON.stringify(content), function(err) {
+                if (err)
+                    reject(err);
+                else
+                    resolve();
+            });
         });
     });
+
+    return savingPromise;
 }
 
 module.exports = {

@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "./node_modules/.bin/nodemon ./bin/www",
+    "start": "./node_modules/.bin/nodemon --ignore storage.json ./bin/www",
     "test": "./node_modules/.bin/mocha tests/**/*.js",
     "cover": "./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha -- -- -u exports -R spec tests/**/*"
   },
