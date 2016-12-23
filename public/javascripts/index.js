@@ -3,19 +3,19 @@
 
     var $todos = $('#todos');
     var $doneTodos = $('#doneTodos');
+    var $itemsLeftToDo = $('#itemsLeftToDo');
+    var countItems = 0;
 
     function myLi(item) {
         var $li = $('<li class="todo-item list-group-item clearfix">');
         // $li.data('todoId', item.id);
 
-
-
         var $title = $('<span class="todo-title" data-editable>').text(item.title);
         $li.append($title);
 
-        var $doneButton = $('<button type="button" class="btn btn-success pull-right">').text('DONE');
-        var $deleteButton = $('<button type="button" class="btn btn-danger pull-right">').text('DELETE');
-        var $notDoneButton = $('<button type="button" class="btn btn-warning pull-right">').text('NOT-DONE');
+        var $doneButton = $('<button type="button" class="btn btn-default pull-left btnFromLeft btnWithSpecialDefault"><span class="glyphicon glyphicon-unchecked"></span></button>');
+        var $deleteButton = $('<button type="button" class="btn btn-default pull-right btnFromRight btnWithSpecialDefault"><span class="glyphicon glyphicon-remove"></span></button>');
+        var $notDoneButton = $('<button type="button" class="btn btn-default pull-left btnFromLeft btnWithSpecialDefault"><span class="glyphicon glyphicon-check"></span></button>');
 
         $li.on('click', '[data-editable]', function() {
             var $el = $(this);
@@ -28,6 +28,10 @@
                     deleteTodo(item.id, function() {
                         $li.remove();
                         toastr.error('You removed an item from the To-Do list!');
+                        if (item.status === 'not-done') {
+                            countItems -= 1;
+                            $itemsLeftToDo.text(countItems + ' left');
+                        }
                     });
                 } else {
                     item.title = $input.val();
@@ -40,9 +44,17 @@
         });
 
         function toggleTodoStatus() {
-            item.status = item.status === 'done' ? 'not-done' : 'done';
+            item.status === 'done' ? (
+                item.status = 'not-done',
+                countItems += 1) : (
+                item.status = 'done',
+                countItems -= 1);
+
             $doneButton.toggle();
             $notDoneButton.toggle();
+
+            $itemsLeftToDo.text(countItems + ' left');
+
             $li.toggleClass('done-todo');
             updateTitle(item.id, item.title, item.status);
             var $targetList = item.status === 'done' ? $doneTodos : $todos;
@@ -57,6 +69,10 @@
             deleteTodo(item.id, function() {
                 $li.remove();
                 toastr.error('You removed an item from the To-Do list!');
+                if (item.status === 'not-done') {
+                    countItems -= 1;
+                    $itemsLeftToDo.text(countItems + ' left');
+                }
             });
         });
 
@@ -75,8 +91,93 @@
     }
 
 
+
     $(function() {
-        $('#markAllDone').on('click', function(event) {
+        $('#toggleCompletion').on('click', function(event) {
+            event.preventDefault();
+            $.ajax({
+                    method: 'GET',
+                    url: '/api/todos'
+                })
+                .done(function(res) {
+
+                    var nr = 0;
+                    countItems = 0;
+                    $todos.empty();
+                    $doneTodos.empty();
+                    $.each(res, function(idx, item) {
+                        if (item.status === 'not-done') {
+                            nr += 1;
+                        }
+                        countItems += 1;
+                    });
+                    if (nr != 0) {
+                        $.each(res, function(idx, item) {
+                            item.status = 'done';
+                            updateTitle(item.id, item.title, item.status);
+                            myLi(item);
+                        });
+                        countItems = 0;
+                        $itemsLeftToDo.text(countItems + ' left');
+                    } else {
+                        $.each(res, function(idx, item) {
+                            item.status = 'not-done';
+                            updateTitle(item.id, item.title, item.status);
+                            myLi(item);
+                        });
+
+                        $itemsLeftToDo.text(countItems + ' left');
+                    }
+                });
+        })
+    })
+
+
+
+    // $(function() {
+    //     $('#markAllDone').on('click', function(event) {
+    //         event.preventDefault();
+    //         $.ajax({
+    //                 method: 'GET',
+    //                 url: '/api/todos'
+    //             })
+    //             .done(function(res) {
+    //                 $todos.empty();
+    //                 $doneTodos.empty();
+    //                 $.each(res, function(idx, item) {
+    //                     item.status = 'done';
+    //                     updateTitle(item.id, item.title, item.status);
+    //                     myLi(item);
+    //                 });
+    //             });
+    //     })
+    // })
+
+
+    // $(function() {
+    //     $('#markAllNotDone').on('click', function(event) {
+    //         event.preventDefault();
+    //         $.ajax({
+    //                 method: 'GET',
+    //                 url: '/api/todos'
+    //             })
+    //             .done(function(res) {
+    //                 $todos.empty();
+    //                 $doneTodos.empty();
+    //                 $.each(res, function(idx, item) {
+    //                     item.status = 'not-done';
+    //                     updateTitle(item.id, item.title, item.status);
+    //                     myLi(item);
+    //                 });
+    //             });
+    //     })
+    // })
+
+
+
+
+    $(function() {
+        $('#clearCompleted').on('click', function(event) {
             event.preventDefault();
             $.ajax({
                     method: 'GET',
@@ -86,51 +187,35 @@
                     $todos.empty();
                     $doneTodos.empty();
                     $.each(res, function(idx, item) {
-                        item.status = 'done';
-                        updateTitle(item.id, item.title, item.status);
-                        myLi(item);
+                        if (item.status === 'done') {
+                            deleteTodo(item.id);
+                        } else {
+                            myLi(item);
+                        }
                     });
                 });
         })
     })
 
 
-    $(function() {
-        $('#markAllNotDone').on('click', function(event) {
-            event.preventDefault();
-            $.ajax({
-                    method: 'GET',
-                    url: '/api/todos'
-                })
-                .done(function(res) {
-                    $todos.empty();
-                    $doneTodos.empty();
-                    $.each(res, function(idx, item) {
-                        item.status = 'not-done';
-                        updateTitle(item.id, item.title, item.status);
-                        myLi(item);
-                    });
-                });
-        })
-    })
 
 
-    $(function() {
-        $('#removeAll').on('click', function(event) {
-            event.preventDefault();
-            $.ajax({
-                    method: 'GET',
-                    url: '/api/todos'
-                })
-                .done(function(res) {
-                    $todos.empty();
-                    $doneTodos.empty();
-                    $.each(res, function(idx, item) {
-                        deleteTodo(item.id);
-                    });
-                });
-        })
-    })
+    // $(function() {
+    //     $('#removeAll').on('click', function(event) {
+    //         event.preventDefault();
+    //         $.ajax({
+    //                 method: 'GET',
+    //                 url: '/api/todos'
+    //             })
+    //             .done(function(res) {
+    //                 $todos.empty();
+    //                 $doneTodos.empty();
+    //                 $.each(res, function(idx, item) {
+    //                     deleteTodo(item.id);
+    //                 });
+    //             });
+    //     })
+    // })
 
 
     function deleteTodo(id, callback) {
@@ -151,10 +236,16 @@
         })
         .done(function(res) {
             $todos.empty();
+            countItems = 0;
             $.each(res, function(idx, item) {
+                if (item.status === 'not-done') {
+                    countItems += 1;
+                }
                 myLi(item);
             });
+            $itemsLeftToDo.text(countItems + ' left');
         });
+
 
     $(function() {
         $('#addTodosForm').on('submit', function(event) {
@@ -169,7 +260,11 @@
                     },
                 })
                 .done(function(res) {
+                    countItems += 1;
+
                     myLi(res);
+
+                    $itemsLeftToDo.text(countItems + ' left');
                 });
         })
     })
