@@ -91,7 +91,6 @@
     }
 
 
-
     $(function() {
         $('#toggleCompletion').on('click', function(event) {
             event.preventDefault();
@@ -133,49 +132,6 @@
     })
 
 
-
-    // $(function() {
-    //     $('#markAllDone').on('click', function(event) {
-    //         event.preventDefault();
-    //         $.ajax({
-    //                 method: 'GET',
-    //                 url: '/api/todos'
-    //             })
-    //             .done(function(res) {
-    //                 $todos.empty();
-    //                 $doneTodos.empty();
-    //                 $.each(res, function(idx, item) {
-    //                     item.status = 'done';
-    //                     updateTitle(item.id, item.title, item.status);
-    //                     myLi(item);
-    //                 });
-    //             });
-    //     })
-    // })
-
-
-    // $(function() {
-    //     $('#markAllNotDone').on('click', function(event) {
-    //         event.preventDefault();
-    //         $.ajax({
-    //                 method: 'GET',
-    //                 url: '/api/todos'
-    //             })
-    //             .done(function(res) {
-    //                 $todos.empty();
-    //                 $doneTodos.empty();
-    //                 $.each(res, function(idx, item) {
-    //                     item.status = 'not-done';
-    //                     updateTitle(item.id, item.title, item.status);
-    //                     myLi(item);
-    //                 });
-    //             });
-    //     })
-    // })
-
-
-
-
     $(function() {
         $('#clearCompleted').on('click', function(event) {
             event.preventDefault();
@@ -196,26 +152,6 @@
                 });
         })
     })
-
-
-
-
-    // $(function() {
-    //     $('#removeAll').on('click', function(event) {
-    //         event.preventDefault();
-    //         $.ajax({
-    //                 method: 'GET',
-    //                 url: '/api/todos'
-    //             })
-    //             .done(function(res) {
-    //                 $todos.empty();
-    //                 $doneTodos.empty();
-    //                 $.each(res, function(idx, item) {
-    //                     deleteTodo(item.id);
-    //                 });
-    //             });
-    //     })
-    // })
 
 
     function deleteTodo(id, callback) {
@@ -268,6 +204,7 @@
                 });
         })
     })
+
 
     function updateTitle(myId, myTitle, myStatus) {
         $.ajax({
