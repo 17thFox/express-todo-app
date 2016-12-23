@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "./node_modules/.bin/nodemon --ignore storage.json ./bin/www",
+    "start": "node ./bin/www",
+    "forever": "./node_modules/.bin/nodemon --ignore storage.json ./bin/www",
     "test": "./node_modules/.bin/mocha tests/**/*.js",
     "cover": "./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha -- -- -u exports -R spec tests/**/*"
   },
@@ -19,6 +20,7 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "istanbul": "^0.4.5",
-    "mocha": "^3.2.0"
+    "mocha": "^3.2.0",
+    "nodemon": "^1.11.0"
   }
 }
