@@ -18,7 +18,7 @@ function loadFromDisk() {
     });
 }
 
-var savingPromise = Promise.resolve();;
+var savingPromise = Promise.resolve();
 
 function saveToDisk(content) {
     savingPromise = savingPromise.then(function () {

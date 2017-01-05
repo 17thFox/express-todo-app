@@ -2,12 +2,12 @@
 
 const todoStatus = require('./todo-status');
 
-const persistentStorage = require('./persistent-storage');
+const redisStorage = require('./redis-storage');
 
 let counter = 1;
 let todos = {};
 
-persistentStorage.loadFromDisk().then(function(content) {
+redisStorage.loadFromRedis().then(function(content) {
     counter = content.counter || 1;
     todos = content.todos || {};
 }).catch(function(err){
@@ -42,7 +42,7 @@ function saveTodo(todo) {
     };
 
     counter += 1;
-    return persistentStorage.saveToDisk({counter: counter, todos: todos}).then(function () {
+    return redisStorage.saveToRedis({counter: counter, todos: todos}).then(function () {
         return Promise.resolve(newTodo);
     });
 }
@@ -59,7 +59,7 @@ function updateTodo(id, newTitle, newStatus) {
     } else {
         todos[id].status = newStatus;
     }
-    return persistentStorage.saveToDisk({counter: counter, todos: todos}).then(function () { 
+    return redisStorage.saveToRedis({counter: counter, todos: todos}).then(function () { 
         return Promise.resolve(todos[id]);
     });
 }
@@ -71,7 +71,7 @@ function deleteTodo(id) {
     }
 
     delete todos[id];
-    return persistentStorage.saveToDisk({counter: counter, todos: todos}).then(function () {
+    return redisStorage.saveToRedis({counter: counter, todos: todos}).then(function () {
         return Promise.resolve(todos);
     });
 }
