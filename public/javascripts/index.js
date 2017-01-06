@@ -174,6 +174,7 @@
             $todos.empty();
             countItems = 0;
             $.each(res, function(idx, item) {
+
                 if (item.status === 'not-done') {
                     countItems += 1;
                 }

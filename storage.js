@@ -4,27 +4,39 @@ const todoStatus = require('./todo-status');
 
 const redisStorage = require('./redis-storage');
 
-let counter = 1;
+// Generate a v4 UUID (random) 
+const uuidV4 = require('uuid/v4');
+
 let todos = {};
 
-redisStorage.loadFromRedis().then(function(content) {
-    counter = content.counter || 1;
-    todos = content.todos || {};
-}).catch(function(err){
-    console.log(err);
-});
+getTodos('done');
+getTodos('not-done');
+
 
 function getTodos(status) {
-    const result = [];
+    return new Promise(function(resolve, reject) {
+        redisStorage.loadFromRedis('todos.' + status).then(function(content) {
+            todos[status] = content || {};
+            todos['done'] = todos['done'] || {};
+            todos['not-done'] = todos['not-done'] || {};
 
-    for (let prop in todos) {
-        if (todos.hasOwnProperty(prop)) {
-            result.push(todos[prop]);
-        }
-    }
+            const result = [];
 
-    return Promise.resolve(result);
+            for (let prop in todos[status]) {
+                if (todos[status].hasOwnProperty(prop) && todos[status][prop]) {
+                    result.push(todos[status][prop]);
+                }
+            }
+            return resolve(result);
+
+        }).catch(function(err) {
+            todos['done'] = todos['done'] || {};
+            todos['not-done'] = todos['not-done'] || {};
+            return resolve([]);
+        });
+    });
 }
+
 
 function saveTodo(todo) {
     if (typeof todo.title !== 'string') {
@@ -35,44 +47,78 @@ function saveTodo(todo) {
         return Promise.reject('Title is empty or just whitespace');
     }
 
-    const newTodo = todos['' + counter] = {
-        id: '' + counter,
+    //uuid for id
+    let uuid = uuidV4(); // -> '110ec58a-a0f2-4ac4-8393-c866d813b8d1' 
+    todos['not-done'][uuid] = {
+        id: uuid,
         title: todo.title,
         status: todoStatus.NOT_DONE
     };
 
-    counter += 1;
-    return redisStorage.saveToRedis({counter: counter, todos: todos}).then(function () {
-        return Promise.resolve(newTodo);
+    return redisStorage.saveToRedis('todos.not-done', todos['not-done']).then(function() {
+        return Promise.resolve(todos['not-done'][uuid]);
     });
 }
 
 
+function getStatus(id) {
+    let status = '';
+
+    if (todos['done'][id]) {
+        status = 'done';
+    } else if (todos['not-done'][id]) {
+        status = 'not-done';
+    } else {
+        return '';
+    }
+
+    return status;
+}
+
+
 function updateTodo(id, newTitle, newStatus) {
-    if (typeof todos[id] === 'undefined') {
+
+    let status = getStatus(id);
+
+    if (status == '') {
         return Promise.reject('Todo with ID ' + id + ' not found');
     }
 
-    todos[id].title = newTitle;
+
+    todos[status][id].title = newTitle;
     if (typeof newStatus === 'undefined') {
-        todos[id].status = todos[id].status;
+        todos[status][id].status = todos[status][id].status;
     } else {
-        todos[id].status = newStatus;
+        todos[status][id].status = newStatus;
     }
-    return redisStorage.saveToRedis({counter: counter, todos: todos}).then(function () { 
-        return Promise.resolve(todos[id]);
+
+    if (newStatus != status) {
+        todos[newStatus][id] = todos[status][id];
+
+        delete todos[status][id];
+        return redisStorage.saveToRedis('todos.' + newStatus, todos[newStatus]).then(function() {
+            return redisStorage.saveToRedis('todos.' + status, todos[status]).then(function() {
+                return Promise.resolve(todos[newStatus][id]);
+            });
+        });
+    }
+
+    return redisStorage.saveToRedis('todos.' + status, todos[status]).then(function() {
+        return Promise.resolve(todos[status][id]);
     });
 }
 
 
 function deleteTodo(id) {
-    if (typeof todos[id] === 'undefined') {
+    let status = getStatus(id);
+
+    if (status == '') {
         return Promise.reject('Todo with ID ' + id + ' not found for delete');
     }
 
-    delete todos[id];
-    return redisStorage.saveToRedis({counter: counter, todos: todos}).then(function () {
-        return Promise.resolve(todos);
+    delete todos[status][id];
+    return redisStorage.saveToRedis('todos.' + status, todos[status]).then(function() {
+        return Promise.resolve(todos[status]);
     });
 }
 
@@ -82,5 +128,4 @@ module.exports = {
     saveTodo: saveTodo,
     updateTodo: updateTodo,
     deleteTodo: deleteTodo
-
 };

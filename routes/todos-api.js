@@ -4,9 +4,14 @@ var router = express.Router();
 var storage = require('../storage');
 
 router.get('/', function(req, res) {
-    storage.getTodos()
-        .then(function(todos) {
-            return res.json(todos);
+    storage.getTodos('done')
+        .then(function(todosDone) {
+            storage.getTodos('not-done')
+                .then(function(todosNotDone) {
+                    console.log('Party: ', todosDone.concat(todosNotDone));
+                    return res.json(todosDone.concat(todosNotDone));
+                });
+
         })
         .catch(function(err) {
             return res.status(500).send(err);

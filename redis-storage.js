@@ -2,8 +2,6 @@
 
 var Redis = require('ioredis');
 
-const storageFileName = './storage.json';
-
 var redis = new Redis({
     port: 6379, // Redis port
     host: '127.0.0.1' // Redis host
@@ -12,13 +10,10 @@ var redis = new Redis({
     // db: 0
 });
 
-// Generate a v4 UUID (random) 
-// const uuidV4 = require('uuid/v4');
-// uuidV4(); // -> '110ec58a-a0f2-4ac4-8393-c866d813b8d1' 
 
-function loadFromRedis() {
+function loadFromRedis(key) {
     return new Promise(function(resolve, reject) {
-        redis.get(storageFileName, function read(err, data) {
+        redis.get(key, function read(err, data) {
             if (!data || data.length === 0) {
                 return reject('There\'s nothing to see here');
             } else if (err) {
@@ -32,10 +27,10 @@ function loadFromRedis() {
 
 var savingPromise = Promise.resolve();
 
-function saveToRedis(content) {
+function saveToRedis(key, content) {
     savingPromise = savingPromise.then(function() {
         return new Promise(function(resolve, reject) {
-            redis.set(storageFileName, JSON.stringify(content));
+            redis.set(key, JSON.stringify(content));
             resolve();
         });
     });
