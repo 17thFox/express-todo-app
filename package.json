@@ -14,12 +14,12 @@
     "debug": "~2.2.0",
     "express": "~4.14.0",
     "hbs": "~4.0.1",
+    "ioredis": "^2.5.0",
     "morgan": "~1.7.0",
     "serve-favicon": "~2.3.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",
-    "ioredis": "^2.4.3",
     "uuid": "^3.0.1",
     "istanbul": "^0.4.5",
     "mocha": "^3.2.0",
