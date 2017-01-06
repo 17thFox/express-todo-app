@@ -13,7 +13,7 @@ a {
 }
 
 .todo-item.done-todo span.todo-title {
-    text-decoration: line-through!important;
+    text-decoration: line-through;
 }
 
 .btn .btnFromLeft {
