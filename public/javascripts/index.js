@@ -37,8 +37,9 @@
                     item.title = $input.val();
                     if (item.status === 'done') {
                         var $span = $('<span data-editable style="text-decoration: line-through;" />').text($input.val());
+                    } else {
+                        var $span = $('<span data-editable style="text-decoration: none;" />').text($input.val());
                     }
-                    var $span = $('<span data-editable style="text-decoration: none;" />').text($input.val());
                     $input.replaceWith($span);
                     updateTitle(item.id, item.title, item.status);
                 }
