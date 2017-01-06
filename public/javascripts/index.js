@@ -35,7 +35,7 @@
                     });
                 } else {
                     item.title = $input.val();
-                    var $span = $('<span data-editable myDoneTodo />').text($input.val());
+                    var $span = $('<span data-editable style="text-decoration: line-through;" />').text($input.val());
                     $input.replaceWith($span);
                     updateTitle(item.id, item.title, item.status);
                 }
