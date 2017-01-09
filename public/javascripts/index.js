@@ -36,9 +36,9 @@
                 } else {
                     item.title = $input.val();
                     if (item.status === 'done') {
-                        var $span = $('<span data-editable lineThrough />').text($input.val());
+                        var $span = $('<span data-editable />').text($input.val());
                     } else {
-                        var $span = $('<span data-editable none />').text($input.val());
+                        var $span = $('<span data-editable />').text($input.val());
                     }
                     $input.replaceWith($span);
                     updateTitle(item.id, item.title, item.status);
@@ -59,8 +59,6 @@
 
             $itemsLeftToDo.text(countItems + ' left');
 
-            // $li.toggleClass('done-todo');
-            // $li.toggleClass('not-done-todo');
             updateTitle(item.id, item.title, item.status);
             var $targetList = item.status === 'done' ? $doneTodos : $todos;
             $targetList.append($li);

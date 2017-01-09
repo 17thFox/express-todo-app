@@ -12,15 +12,6 @@ a {
     line-height: 30px
 }
 
-
-/*.todo-item.done-todo span.todo-title {
-    text-decoration: line-through;
-}
-
-.todo-item.not-done-todo span.todo-title {
-    text-decoration: none;
-}*/
-
 #todos .list-group-item{
     text-decoration: none;
 }
