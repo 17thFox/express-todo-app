@@ -21,11 +21,11 @@ a {
     text-decoration: none;
 }*/
 
-#todos > li > span .none{
+#todos li span .none{
     text-decoration: none;
 }
 
-#doneTodos > li > span .lineThrough{
+#doneTodos li span .lineThrough{
     text-decoration: line-through;
 }
 
