@@ -21,11 +21,11 @@ a {
     text-decoration: none;
 }*/
 
-#todos span.none{
+#todos .list-group-item{
     text-decoration: none;
 }
 
-#doneTodos span.lineThrough{
+#doneTodos .list-group-item{
     text-decoration: line-through;
 }
 
