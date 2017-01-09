@@ -12,9 +12,9 @@ a {
     line-height: 30px
 }
 
-.todo-item.done-todo span.todo-title {
+/*.todo-item.done-todo span.todo-title {
     text-decoration: line-through;
-}
+}*/
 
 .btn .btnFromLeft {
     margin-right: 5px;
