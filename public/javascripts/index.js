@@ -60,6 +60,7 @@
             $itemsLeftToDo.text(countItems + ' left');
 
             $li.toggleClass('done-todo');
+            $li.toggleClass('not-done-todo');
             updateTitle(item.id, item.title, item.status);
             var $targetList = item.status === 'done' ? $doneTodos : $todos;
             $targetList.append($li);
