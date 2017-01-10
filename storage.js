@@ -9,8 +9,8 @@ const uuidV4 = require('uuid/v4');
 
 let todos = {};
 
-getTodos('done');
-getTodos('not-done');
+// getTodos('done');
+// getTodos('not-done');
 
 
 function getTodos(status) {
