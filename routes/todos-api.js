@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
-var storage = require('../storage');
+var storage = require('../redis-storage');
 
 router.get('/', function(req, res) {
     storage.getTodos('done')
@@ -19,6 +19,7 @@ router.get('/', function(req, res) {
 });
 
 router.post('/', function(req, res) {
+
     storage.saveTodo(req.body)
         .then(function(newTodo) {
             return res.json(newTodo);

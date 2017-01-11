@@ -3,7 +3,7 @@ const assert = require('assert');
 const expect = require('chai').expect;
 
 const todoStatus = require('../todo-status');
-const storage = require('../storage');
+const storage = require('../redis-storage');
 
 function expectMyPromise(theThing) {
     expect(theThing).to.be.instanceOf(Object);
