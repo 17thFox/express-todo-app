@@ -1,17 +1,18 @@
 var express = require('express');
 var router = express.Router();
 
-var storage = require('../redis-storage');
+var storage = require('../knex-storage');
 
 router.get('/', function(req, res) {
     storage.getTodos('done')
         .then(function(todosDone) {
-            storage.getTodos('not-done')
-                .then(function(todosNotDone) {
-                    console.log('Party: ', todosDone.concat(todosNotDone));
-                    return res.json(todosDone.concat(todosNotDone));
-                });
-
+            // storage.getTodos('not-done')
+                // .then(function(todosNotDone) {
+                    // console.log('Party: ', todosDone.concat(todosNotDone));
+                    // return res.json(todosDone.concat(todosNotDone));
+                    console.log('Party: ', todosDone);
+                    return res.json(todosDone);
+                // });
         })
         .catch(function(err) {
             return res.status(500).send(err);

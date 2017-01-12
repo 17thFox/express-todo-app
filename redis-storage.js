@@ -10,19 +10,19 @@ const uuidV4 = require('uuid/v4');
 
 let redis = new Redis(process.env.REDIS_URL);
 
-function getTodos(status) {
-    return new Promise(function(resolve, reject) {
-        const result = [];
 
-        redis.hgetall(status).then(function(content) {
-            for (let prop in content) {
-                if (content.hasOwnProperty(prop)) {
-                    result.push(JSON.parse(content[prop]));
-                }
+function getTodos(status) {
+    const result = [];
+
+    return redis.hgetall(status).then(function(content) {
+
+        for (let prop in content) {
+            if (content.hasOwnProperty(prop)) {
+                result.push(JSON.parse(content[prop]));
             }
-            return resolve(result);
-        });
-    })
+        }
+        return result;
+    });
 }
 
 
