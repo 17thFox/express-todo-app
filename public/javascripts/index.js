@@ -1,225 +1,126 @@
-(function() {
-    'use strict';
 
-    var $todos = $('#todos');
-    var $doneTodos = $('#doneTodos');
-    var $itemsLeftToDo = $('#itemsLeftToDo');
-    var countItems = 0;
+var card = new Vue({
+    delimiters: ['${', '}'],
+    el: "#card",
+    data: {
+        activeEditorIndex: -1,
+        activeEditorCompleted: false,
+        title: "Your Todo List",
+        items: [],
+        itemsCompleted: []
+    },
 
-    function myLi(item) {
-        var $li = $('<li class="todo-item list-group-item clearfix">');
-        // $li.data('todoId', item.id);
-
-        var $title = $('<span class="todo-title" data-editable>').text(item.title);
-        $li.append($title);
-
-        var $doneButton = $('<button type="button" class="btn btn-default pull-left btnFromLeft btnWithSpecialDefault"><span class="glyphicon glyphicon-unchecked"></span></button>');
-        var $deleteButton = $('<button type="button" class="btn btn-default pull-right btnFromRight btnWithSpecialDefault"><span class="glyphicon glyphicon-remove"></span></button>');
-        var $notDoneButton = $('<button type="button" class="btn btn-default pull-left btnFromLeft btnWithSpecialDefault"><span class="glyphicon glyphicon-check"></span></button>');
-
-        $li.on('click', '[data-editable]', function() {
-            var $el = $(this);
-
-            var $input = $('<input/>').val($el.text());
-            $el.replaceWith($input);
-
-            var save = function() {
-                if ($input.val().length === 0) {
-                    deleteTodo(item.id, function() {
-                        $li.remove();
-                        toastr.error('You removed an item from the To-Do list!');
-                        if (item.status === 'not-done') {
-                            countItems -= 1;
-                            $itemsLeftToDo.text(countItems + ' left');
-                        }
-                    });
-                } else {
-                    item.title = $input.val();
-                    if (item.status === 'done') {
-                        var $span = $('<span data-editable />').text($input.val());
-                    } else {
-                        var $span = $('<span data-editable />').text($input.val());
-                    }
-                    $input.replaceWith($span);
-                    updateTitle(item.id, item.title, item.status);
-                }
-            };
-            $input.on('blur', save).focus();
-        });
-
-        function toggleTodoStatus() {
-            item.status === 'done' ? (
-                item.status = 'not-done',
-                countItems += 1) : (
-                item.status = 'done',
-                countItems -= 1);
-
-            $doneButton.toggle();
-            $notDoneButton.toggle();
-
-            $itemsLeftToDo.text(countItems + ' left');
-
-            updateTitle(item.id, item.title, item.status);
-            var $targetList = item.status === 'done' ? $doneTodos : $todos;
-            $targetList.append($li);
-            item.status === 'done' ? toastr.success('You achieved an item from the To-Do list!') : toastr.warning('You resurrected an item from the To-Do list!');
+    computed: {
+        totalLeft: function() {
+            return this.items.length;
         }
+    },
 
-        $doneButton.on('click', toggleTodoStatus);
-        $notDoneButton.on('click', toggleTodoStatus);
-
-        $deleteButton.on('click', function() {
-            deleteTodo(item.id, function() {
-                $li.remove();
-                toastr.error('You removed an item from the To-Do list!');
-                if (item.status === 'not-done') {
-                    countItems -= 1;
-                    $itemsLeftToDo.text(countItems + ' left');
-                }
-            });
-        });
-
-        $li.append($deleteButton);
-        $li.append($doneButton);
-        $li.append($notDoneButton);
-
-        if (item.status === 'not-done') {
-            $notDoneButton.hide();
-            $todos.append($li);
-        } else {
-            $doneButton.hide();
-            $doneTodos.append($li);
-            $li.toggleClass('done-todo');
+    watch: {
+        items: function(newItems, oldItems) {
+            console.log(newItems, oldItems);
+        },
+        itemsCompleted: function(newItemsCompleted, oldItemsCompleted) {
+            console.log(newItemsCompleted[0].text, oldItemsCompleted.length);
         }
-    }
+    },
 
-
-    $(function() {
-        $('#toggleCompletion').on('click', function(event) {
-            event.preventDefault();
+    methods: {
+        fetchData: function() {
+            var self = this;
             $.ajax({
                     method: 'GET',
                     url: '/api/todos'
                 })
                 .done(function(res) {
-
-                    var nr = 0;
-                    countItems = 0;
-                    $todos.empty();
-                    $doneTodos.empty();
-                    $.each(res, function(idx, item) {
-                        if (item.status === 'not-done') {
-                            nr += 1;
-                        }
-                        countItems += 1;
-                    });
-                    if (nr != 0) {
-                        $.each(res, function(idx, item) {
-                            item.status = 'done';
-                            updateTitle(item.id, item.title, item.status);
-                            myLi(item);
-                        });
-                        countItems = 0;
-                        $itemsLeftToDo.text(countItems + ' left');
-                    } else {
-                        $.each(res, function(idx, item) {
-                            item.status = 'not-done';
-                            updateTitle(item.id, item.title, item.status);
-                            myLi(item);
-                        });
-
-                        $itemsLeftToDo.text(countItems + ' left');
-                    }
-                });
-        })
-    })
-
-
-    $(function() {
-        $('#clearCompleted').on('click', function(event) {
-            event.preventDefault();
-            $.ajax({
-                    method: 'GET',
-                    url: '/api/todos'
-                })
-                .done(function(res) {
-                    $todos.empty();
-                    $doneTodos.empty();
                     $.each(res, function(idx, item) {
                         if (item.status === 'done') {
-                            deleteTodo(item.id);
-                        } else {
-                            myLi(item);
+                            self.items.push({
+                                id: item.id,
+                                text: item.title
+                            });
+                        }
+                        else {
+                            self.itemsCompleted.push({
+                                id: item.id,
+                                text: item.title
+                            });
                         }
                     });
                 });
-        })
-    })
 
+        },
+        addItem: function() {
+            var input = document.getElementById('addTodosInput');
 
-    function deleteTodo(id, callback) {
-        $.ajax({
-                method: 'DELETE',
-                url: '/api/todos/' + id
-            })
-            .done(function() {
-                if (typeof callback === 'function') {
-                    callback();
-                }
-            })
-    }
-
-    $.ajax({
-            method: 'GET',
-            url: '/api/todos'
-        })
-        .done(function(res) {
-            $todos.empty();
-            countItems = 0;
-            $.each(res, function(idx, item) {
-
-                if (item.status === 'not-done') {
-                    countItems += 1;
-                }
-                myLi(item);
-            });
-            $itemsLeftToDo.text(countItems + ' left');
-        });
-
-
-    $(function() {
-        $('#addTodosForm').on('submit', function(event) {
-            event.preventDefault();
-            var myAddTodosInput = $('#addTodosInput').val();
-
-            $.ajax({
-                    method: 'POST',
-                    url: '/api/todos',
-                    data: {
-                        title: myAddTodosInput
-                    },
-                })
-                .done(function(res) {
-                    countItems += 1;
-
-                    myLi(res);
-
-                    $itemsLeftToDo.text(countItems + ' left');
+            if (input.value !== '') {
+                this.items.push({
+                    text: input.value
                 });
-        })
-    })
+                input.value = '';
+            }
+        },
 
+        checkItem: function(index) {
+            this.itemsCompleted.unshift({
+                text: this.items[index].text
+            });
+            this.items.splice(index, 1);
+        },
 
-    function updateTitle(myId, myTitle, myStatus) {
-        $.ajax({
-                method: "PUT",
-                url: "/api/todos",
-                data: {
-                    id: myId,
-                    title: myTitle,
-                    status: myStatus
-                },
-            })
-            .done();
+        uncheckItem: function(index) {
+            this.items.push({
+                text: this.itemsCompleted[index].text
+            });
+            this.itemsCompleted.splice(index, 1);
+        },
+
+        clearCompleted: function() {
+            this.itemsCompleted.splice(0, this.itemsCompleted.length);
+        },
+        deleteItemCompleted: function(index) {
+            this.itemsCompleted.splice(index, 1);
+        },
+        deleteItem: function(index) {
+            this.items.splice(index, 1);
+        },
+        changed: function(event, index) {
+
+            $that = this;
+            if ($(event.target).val() === '') {
+                if (this.activeEditorCompleted) {
+                    $that.itemsCompleted.splice(index, 1);
+                } else {
+                    $that.items.splice(index, 1);
+                }
+                this.activeEditorIndex = -1;
+            }
+        },
+        blurred: function(event, index, isCompleted) {
+            this.activeEditorIndex = -1;
+        },
+        spanClicked: function(event, index, isCompleted) {
+            this.activeEditorCompleted = isCompleted;
+            this.activeEditorIndex = index;
+        }
+    },
+    created: function() {
+        this.fetchData()
     }
-})();
+});
+
+
+
+
+
+            // this.$http.get('/api/todos').then(function(response) {
+
+            //     // this.$set('datas', response.data);
+            //     console.log('response', response);
+            //     $.each(response, function(idx, item) {
+
+            //         console.log('item', item.status);
+            //     });
+            // }, function(response) {
+            //     // error callback
+            // });
