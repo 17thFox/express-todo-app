@@ -3,7 +3,7 @@
 
 let knex = require('knex')({
     client: 'pg',
-    connection: HEROKU_POSTGRESQL_OLIVE_URL,
+    connection: process.env.HEROKU_POSTGRESQL_OLIVE_URL,
     ssl: true
 });
 
