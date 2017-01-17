@@ -1,4 +1,3 @@
-
 var card = new Vue({
     delimiters: ['${', '}'],
     el: "#card",
@@ -18,10 +17,10 @@ var card = new Vue({
 
     watch: {
         items: function(newItems, oldItems) {
-            console.log(newItems, oldItems);
+            // console.log(newItems, oldItems);
         },
         itemsCompleted: function(newItemsCompleted, oldItemsCompleted) {
-            console.log(newItemsCompleted[0].text, oldItemsCompleted.length);
+            // console.log(newItemsCompleted[0].text, oldItemsCompleted.length);
         }
     },
 
@@ -34,13 +33,12 @@ var card = new Vue({
                 })
                 .done(function(res) {
                     $.each(res, function(idx, item) {
-                        if (item.status === 'done') {
+                        if (item.status !== 'done') {
                             self.items.push({
                                 id: item.id,
                                 text: item.title
                             });
-                        }
-                        else {
+                        } else {
                             self.itemsCompleted.push({
                                 id: item.id,
                                 text: item.title
@@ -52,45 +50,67 @@ var card = new Vue({
         },
         addItem: function() {
             var input = document.getElementById('addTodosInput');
+            var self = this;
 
             if (input.value !== '') {
-                this.items.push({
-                    text: input.value
-                });
+                $.ajax({
+                        method: 'POST',
+                        url: '/api/todos',
+                        data: {
+                            title: input.value
+                        },
+                    })
+                    .done(function(res) {
+                        self.items.push({
+                            id: res.id,
+                            text: res.title
+                        });
+                    });
                 input.value = '';
             }
         },
 
         checkItem: function(index) {
-            this.itemsCompleted.unshift({
-                text: this.items[index].text
+            var self = this;
+            updateTitle(self.items[index].id, self.items[index].title, 'done');
+            self.itemsCompleted.unshift({
+                id: self.items[index].id,
+                text: self.items[index].text
             });
-            this.items.splice(index, 1);
+            self.items.splice(index, 1);
         },
-
         uncheckItem: function(index) {
-            this.items.push({
-                text: this.itemsCompleted[index].text
+            var self = this;
+            updateTitle(self.itemsCompleted[index].id, self.itemsCompleted[index].title, 'not-done');
+            self.items.push({
+                id: self.itemsCompleted[index].id,
+                text: self.itemsCompleted[index].text
             });
-            this.itemsCompleted.splice(index, 1);
-        },
-
-        clearCompleted: function() {
-            this.itemsCompleted.splice(0, this.itemsCompleted.length);
-        },
-        deleteItemCompleted: function(index) {
-            this.itemsCompleted.splice(index, 1);
+            self.itemsCompleted.splice(index, 1);
         },
         deleteItem: function(index) {
+            deleteTodo(this.items[index].id);
             this.items.splice(index, 1);
         },
+        deleteItemCompleted: function(index) {
+            deleteTodo(this.itemsCompleted[index].id);
+            this.itemsCompleted.splice(index, 1);
+        },
+        clearCompleted: function() {
+            var self = this;
+            for (var i = 0; i < self.itemsCompleted.length; i++) {
+                deleteTodo(self.itemsCompleted[i].id);
+            }
+            self.itemsCompleted.splice(0, self.itemsCompleted.length);
+        },
         changed: function(event, index) {
-
             $that = this;
             if ($(event.target).val() === '') {
                 if (this.activeEditorCompleted) {
+                    deleteTodo($that.itemsCompleted[index].id);
                     $that.itemsCompleted.splice(index, 1);
                 } else {
+                    deleteTodo($that.items[index].id);
                     $that.items.splice(index, 1);
                 }
                 this.activeEditorIndex = -1;
@@ -110,17 +130,27 @@ var card = new Vue({
 });
 
 
+function deleteTodo(id, callback) {
+    $.ajax({
+            method: 'DELETE',
+            url: '/api/todos/' + id
+        })
+        .done(function() {
+            if (typeof callback === 'function') {
+                callback();
+            }
+        })
+}
 
-
-
-            // this.$http.get('/api/todos').then(function(response) {
-
-            //     // this.$set('datas', response.data);
-            //     console.log('response', response);
-            //     $.each(response, function(idx, item) {
-
-            //         console.log('item', item.status);
-            //     });
-            // }, function(response) {
-            //     // error callback
-            // });
+function updateTitle(myId, myTitle, myStatus) {
+    $.ajax({
+            method: "PUT",
+            url: "/api/todos",
+            data: {
+                id: myId,
+                title: myTitle,
+                status: myStatus
+            },
+        })
+        .done();
+}

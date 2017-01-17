@@ -34,7 +34,7 @@ function saveTodo(todo) {
             return reject('Title is empty or just whitespace');
         }
 
-        knex(todos).returning(myId).insert({ Title: todo.title }).then(function(id) {
+        knex(todos).returning(myId).insert({ title: todo.title }).then(function(id) {
             return knex(todos).where(myId, id[0])
         }).then(function(content) {
             return resolve(content[0]);
