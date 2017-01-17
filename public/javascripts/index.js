@@ -71,22 +71,20 @@ var card = new Vue({
         },
 
         checkItem: function(index) {
-            var self = this;
-            updateTitle(self.items[index].id, self.items[index].title, 'done');
-            self.itemsCompleted.unshift({
-                id: self.items[index].id,
-                text: self.items[index].text
+            updateTitle(this.items[index].id, this.items[index].text, 'done');
+            this.itemsCompleted.unshift({
+                id: this.items[index].id,
+                text: this.items[index].text
             });
-            self.items.splice(index, 1);
+            this.items.splice(index, 1);
         },
         uncheckItem: function(index) {
-            var self = this;
-            updateTitle(self.itemsCompleted[index].id, self.itemsCompleted[index].title, 'not-done');
-            self.items.push({
-                id: self.itemsCompleted[index].id,
-                text: self.itemsCompleted[index].text
+            updateTitle(this.itemsCompleted[index].id, this.itemsCompleted[index].text, 'not-done');
+            this.items.push({
+                id: this.itemsCompleted[index].id,
+                text: this.itemsCompleted[index].text
             });
-            self.itemsCompleted.splice(index, 1);
+            this.itemsCompleted.splice(index, 1);
         },
         deleteItem: function(index) {
             deleteTodo(this.items[index].id);
@@ -97,26 +95,41 @@ var card = new Vue({
             this.itemsCompleted.splice(index, 1);
         },
         clearCompleted: function() {
-            var self = this;
-            for (var i = 0; i < self.itemsCompleted.length; i++) {
-                deleteTodo(self.itemsCompleted[i].id);
+            for (var i = 0; i < this.itemsCompleted.length; i++) {
+                deleteTodo(this.itemsCompleted[i].id);
             }
-            self.itemsCompleted.splice(0, self.itemsCompleted.length);
+            this.itemsCompleted.splice(0, this.itemsCompleted.length);
+        },
+        toggleCompletion: function() {
+            if (this.itemsCompleted.length === 0) {
+                toggleCompletionFor(this.items, this.itemsCompleted, 'done');
+
+            } else if (this.items.length === 0) {
+                toggleCompletionFor(this.itemsCompleted, this.items, 'not-done');
+
+            } else {
+                toggleCompletionFor(this.items, this.itemsCompleted, 'done');
+            }
         },
         changed: function(event, index) {
-            $that = this;
             if ($(event.target).val() === '') {
                 if (this.activeEditorCompleted) {
-                    deleteTodo($that.itemsCompleted[index].id);
-                    $that.itemsCompleted.splice(index, 1);
+                    deleteTodo(this.itemsCompleted[index].id);
+                    this.itemsCompleted.splice(index, 1);
                 } else {
-                    deleteTodo($that.items[index].id);
-                    $that.items.splice(index, 1);
+                    deleteTodo(this.items[index].id);
+                    this.items.splice(index, 1);
                 }
                 this.activeEditorIndex = -1;
             }
         },
         blurred: function(event, index, isCompleted) {
+            if (this.activeEditorCompleted === true && this.activeEditorIndex !== -1) {
+                updateTitle(this.itemsCompleted[index].id, this.itemsCompleted[index].text, 'done');
+            } else if (this.activeEditorCompleted === false && this.activeEditorIndex !== -1) {
+                updateTitle(this.items[index].id, this.items[index].text, 'not-done');
+            }
+
             this.activeEditorIndex = -1;
         },
         spanClicked: function(event, index, isCompleted) {
@@ -129,6 +142,16 @@ var card = new Vue({
     }
 });
 
+function toggleCompletionFor(itemsToSplice, itemsToUnshift, status) {
+    for (var i = itemsToSplice.length - 1; i >= 0; i--) {
+        updateTitle(itemsToSplice[i].id, itemsToSplice[i].text, status);
+        itemsToUnshift.unshift({
+            id: itemsToSplice[i].id,
+            text: itemsToSplice[i].text
+        });
+        itemsToSplice.splice(i, 1);
+    }
+}
 
 function deleteTodo(id, callback) {
     $.ajax({
