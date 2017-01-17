@@ -3,13 +3,8 @@
 
 let knex = require('knex')({
     client: 'pg',
-    connection: {
-        host: '127.0.0.1',
-        port: 5432,
-        user: 'postgres',
-        password: 'p@ssw0rd',
-        database: 'postgres'
-    }
+    connection: HEROKU_POSTGRESQL_OLIVE_URL,
+    ssl: true
 });
 
 let todos = 'todos';

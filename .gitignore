@@ -48,6 +48,3 @@ jspm_packages
 
 # Storage for todos
 storage.json
-
-#Pg Admin4
-pgadmin4
