@@ -1,4 +1,4 @@
 module.exports = {
-	DONE: 'done',
-	NOT_DONE: 'not-done'
+  DONE: 'done',
+  NOT_DONE: 'not-done',
 };

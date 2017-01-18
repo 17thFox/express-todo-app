@@ -1,41 +1,38 @@
-'use strict';
+
 
 const fs = require('fs');
 
 const storageFileName = './storage.json';
 
 function loadFromDisk() {
-    return new Promise(function(resolve, reject) {
-        fs.readFile(storageFileName,'utf-8', function read(err, data) {
-            if (!data || data.length === 0) {
-                return reject('There\'s nothing to see here');
-            } else if (err) {
-                return reject(err);
-            }
-            let content = JSON.parse(data);
-            return resolve(content);
-        });
+  return new Promise((resolve, reject) => {
+    fs.readFile(storageFileName, 'utf-8', (err, data) => {
+      if (!data || data.length === 0) {
+        return reject('There\'s nothing to see here');
+      } else if (err) {
+        return reject(err);
+      }
+      const content = JSON.parse(data);
+      return resolve(content);
     });
+  });
 }
 
-var savingPromise = Promise.resolve();
+let savingPromise = Promise.resolve();
 
 function saveToDisk(content) {
-    savingPromise = savingPromise.then(function () {
-        return new Promise(function(resolve, reject) {
-            fs.writeFile(storageFileName, JSON.stringify(content), function(err) {
-                if (err)
-                    reject(err);
-                else
-                    resolve();
-            });
-        });
+  savingPromise = savingPromise.then(() => new Promise((resolve, reject) => {
+    fs.writeFile(storageFileName, JSON.stringify(content), (err) => {
+      if (err) { reject(err); } else {
+        resolve();
+      }
     });
+  }));
 
-    return savingPromise;
+  return savingPromise;
 }
 
 module.exports = {
-    saveToDisk: saveToDisk,
-    loadFromDisk: loadFromDisk
+  saveToDisk,
+  loadFromDisk,
 };

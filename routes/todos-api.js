@@ -1,53 +1,31 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
 
-var storage = require('../knex-storage');
+const router = express.Router();
 
-router.get('/', function(req, res) {
-    storage.getTodos('done')
-        .then(function(todosDone) {
-            // storage.getTodos('not-done')
-                // .then(function(todosNotDone) {
-                    // console.log('Party: ', todosDone.concat(todosNotDone));
-                    // return res.json(todosDone.concat(todosNotDone));
-                    console.log('Party: ', todosDone);
-                    return res.json(todosDone);
-                // });
-        })
-        .catch(function(err) {
-            return res.status(500).send(err);
-        });
+const storage = require('../knex-storage');
+
+router.get('/', (req, res) => {
+  storage.getTodos()
+        .then((todosDone) => res.json(todosDone))
+        .catch(err => res.status(500).send(err));
 });
 
-router.post('/', function(req, res) {
-
-    storage.saveTodo(req.body)
-        .then(function(newTodo) {
-            return res.json(newTodo);
-        })
-        .catch(function(err) {
-            return res.status(500).send(err);
-        });
+router.post('/', (req, res) => {
+  storage.saveTodo(req.body)
+        .then(newTodo => res.json(newTodo))
+        .catch(err => res.status(500).send(err));
 });
 
-router.put('/', function(req, res) {
-    storage.updateTodo(req.body.id, req.body.title, req.body.status)
-        .then(function(todos) {
-            return res.json(todos);
-        })
-        .catch(function(err) {
-            return res.status(500).send(err);
-        });
+router.put('/', (req, res) => {
+  storage.updateTodo(req.body.id, req.body.title, req.body.status)
+        .then(todos => res.json(todos))
+        .catch(err => res.status(500).send(err));
 });
 
-router.delete('/:id', function(req, res) {
-    storage.deleteTodo(req.params.id)
-        .then(function(todos) {
-            return res.json(todos);
-        })
-        .catch(function(err) {
-            return res.status(500).send(err);
-        });
+router.delete('/:id', (req, res) => {
+  storage.deleteTodo(req.params.id)
+        .then(todos => res.json(todos))
+        .catch(err => res.status(500).send(err));
 });
 
 module.exports = router;
